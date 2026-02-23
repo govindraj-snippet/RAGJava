@@ -5,8 +5,13 @@ import com.vectordb.NetworkClient;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonArray;
+import com.vectordb.Document;
+import com.vectordb.VectorDatabase;
 
 public class Main {
+
+   public static VectorDatabase db = new VectorDatabase() ; 
+
     public static void main(String args[]) {
         System.out.println("starting the application ");
 
@@ -24,16 +29,18 @@ public class Main {
             JsonArray jsonArray = jsonObject.getAsJsonObject("embedding").getAsJsonArray("values");
 
             float[] vector = new float[jsonArray.size()];
-
+          
             for (int i = 0; i < jsonArray.size(); i++) {
                 vector[i] = jsonArray.get(i).getAsFloat();
             }
 
-            System.out.println("✅ Success! Extracted " + vector.length + " dimensions.");
-            System.out.println("First 5 values: [" + vector[0] + ", " + vector[1] + ", " +
-                    vector[2] + ", " + vector[3] + ", " + vector[4] + ", ...]");
+            Document doc = new Document(textToEmbed, vector) ;
 
-            System.out.println("working perfectly !! ");
+            db.insert(doc) ;
+            
+            System.out.println("doc saved succesfull " + db.getSize()) ; 
+
+          
 
         } else {
             System.out.println("Failed to get embedding! ");

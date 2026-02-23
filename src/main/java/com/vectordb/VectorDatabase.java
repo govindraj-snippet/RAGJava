@@ -1,13 +1,14 @@
 package com.vectordb;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VectorDatabase {
 
     private List<Document>documents ;
 
-    public VectorDatabase(List<Document>documents ){
-        this.documents = documents ; 
+    public VectorDatabase( ){
+        this.documents = new ArrayList<>() ; 
     }
     public void insert(Document doc ){
         this.documents.add(doc) ;
