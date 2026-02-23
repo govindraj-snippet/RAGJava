@@ -20,6 +20,32 @@ public class VectorDatabase {
         return this.documents.size() ; 
     }
 
+    public Document search (float [] queryVector){
+
+        double bestScore = -1.0 ; 
+        Document bestMatch = null ; 
+
+        for( Document doc : this.documents ){
+
+            double score = VectorMath.cosineSimilarity( queryVector , doc.getEmbedding()) ; 
+
+            if( score > bestScore ){
+                bestScore = score ; 
+                bestMatch = doc ; 
+            }
+        }
+
+        if( bestMatch != null ){
+            System.out.println("Match Found! Similarity Score: " + bestScore ) ; 
+        }
+
+        return bestMatch ; 
+
+
+    }
+
+        
+
     
 
 
