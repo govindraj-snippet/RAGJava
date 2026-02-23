@@ -38,7 +38,7 @@ public class Main {
         System.out.println("Database populated! Total documents: " + db.getSize());
 
      
-        String searchQuery = "I am very hungry for Italian food.";
+        String searchQuery = "What is the status of stock Market.";
         System.out.println("Searching Database for: '" + searchQuery + "'\n");
 
       
