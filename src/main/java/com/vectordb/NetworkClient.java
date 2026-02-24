@@ -1,10 +1,16 @@
 package com.vectordb;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import io.github.cdimascio.dotenv.Dotenv;
+import java.net.URL;
+
 
 public class NetworkClient {
 
@@ -53,6 +59,41 @@ String jsonPayload = "{\n" +
         }
 
     }
+
+   public String genrateAnswer( String prompt ){
+
+        try{
+            String urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+            URL url = new URI(urlString).toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true) ; 
+
+            String cleanPrompt = prompt.replace("\"", "\\\"").replace("\n", " ");
+
+            String jsonInputString = "{\"contents\": [{\"parts\": [{\"text\": \"" + cleanPrompt + "\"}]}]}";
+            
+            try(OutputStream os = conn.getOutputStream()){
+                byte[] input = jsonInputString.getBytes("utf-8") ; 
+                os.write(input , 0 , input.length) ;
+
+            }
+            BufferedReader br = new BufferedReader( new InputStreamReader(conn.getInputStream() , "utf-8")) ;
+            StringBuilder response = new StringBuilder() ; 
+            String responseLine ; 
+            while((responseLine = br.readLine()) != null ){
+                response.append(responseLine.trim()) ; 
+
+            }
+            return response.toString() ; 
+
+
+        }catch( Exception e ){
+            return "Error: " + e.getMessage() ;
+        }
+   }
+
 
     
 }
