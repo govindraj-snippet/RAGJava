@@ -1,4 +1,4 @@
-package com.vectordb;
+package com.vectordb.models;
 
 
 public class Document {

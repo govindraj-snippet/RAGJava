@@ -1,11 +1,11 @@
-package com.vectordb;
+package com.vectordb.cli;
 
-import com.vectordb.NetworkClient;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonArray;
-import com.vectordb.Document;
-import com.vectordb.VectorDatabase;
+import com.vectordb.api.NetworkClient;
+import com.vectordb.database.VectorDatabase;
+import com.vectordb.models.Document;
 
 public class Main {
 

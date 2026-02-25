@@ -1,4 +1,4 @@
-package com.vectordb;
+package com.vectordb.parsers;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,7 +1,9 @@
-package com.vectordb;
+package com.vectordb.database;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.vectordb.models.Document;
 
 public class VectorDatabase {
 

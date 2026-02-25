@@ -1,4 +1,4 @@
-package com.vectordb;
+package com.vectordb.database;
 
 public class VectorMath {
 

@@ -1,4 +1,4 @@
-package com.vectordb;
+package com.vectordb.api;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

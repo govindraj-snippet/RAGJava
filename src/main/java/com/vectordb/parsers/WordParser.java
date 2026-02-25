@@ -1,4 +1,4 @@
-package com.vectordb;
+package com.vectordb.parsers;
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;

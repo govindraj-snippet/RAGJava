@@ -1,6 +1,9 @@
-package com.vectordb;
+package com.vectordb.cli;
 
 import java.util.Scanner;
+
+import com.vectordb.parsers.DocumentParser;
+import com.vectordb.parsers.ParserFactory;
 
 public class CLIApp {
     public static void main( String [] args ){
