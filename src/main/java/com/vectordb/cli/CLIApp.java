@@ -49,14 +49,28 @@ public class CLIApp {
         scanner.close();
     }
 
-    private static void processUpload(String filePath) {
+   private static void processUpload(String filePath) {
         try {
-            DocumentParser parser = ParserFactory.getParser(filePath);
             System.out.println("Extracting text...");
-            String extractedText = parser.extractText(filePath);
-            
+            String extractedText = "";
+            String lowerPath = filePath.toLowerCase();
+
+            // 1. Check if it's a PDF or a TXT
+            if (lowerPath.endsWith(".pdf")) {
+                DocumentParser parser = ParserFactory.getParser(filePath);
+                extractedText = parser.extractText(filePath);
+            } 
+            else if (lowerPath.endsWith(".txt")) {
+                // Read the TXT file directly using Java's built-in Files class
+                extractedText = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath)));
+            } 
+            else {
+                System.out.println("Error: Unsupported file format. Please upload a .pdf or .txt file.");
+                return;
+            }
+
             System.out.println("Slicing text into smart chunks...");
-            List<String> chunks = TextChunker.chunkText(extractedText, 100, 20);
+            List<String> chunks = TextChunker.chunkText(extractedText, 500, 100);
             System.out.println("Created " + chunks.size() + " manageable chunks.");
 
             System.out.println("Memorizing document (Rate Limiter Active)...");
@@ -66,7 +80,7 @@ public class CLIApp {
                 boolean success = false;
                 int waitTime = 2000; 
                 
-               while (!success) {
+                while (!success) {
                     try {
                         String vectorString = aiClient.getEmbedding(chunk); 
                         float[] vector = parseVector(vectorString);
@@ -79,14 +93,12 @@ public class CLIApp {
                             break; 
                         }
                     } catch (Exception e) {
-                      
                         System.out.println("\nAPI Error: " + e.getMessage()); 
                         System.out.println("Pausing for " + (waitTime/1000) + " seconds...");
                         
                         Thread.sleep(waitTime);
                         waitTime *= 2; 
                         
-                      
                         if (waitTime > 120000) {
                             System.out.println("\nGiving up on this chunk. Moving to the next one.");
                             break;
@@ -101,7 +113,6 @@ public class CLIApp {
             System.out.println("Error processing file: " + e.getMessage());
         }
     }
-
     private static void processChat(String question) {
         if (db.getSize() == 0) {
             System.out.println("The database is empty! Please /upload a document first.");
@@ -119,9 +130,23 @@ public class CLIApp {
             String prompt = "Answer the question using ONLY the provided context. " +
                             "Context: " + bestMatch.getText() + " " +
                             "Question: " + question;
+            String safePrompt = prompt.replace("\\", "\\\\")  // Escape slashes
+                                  .replace("\"", "\\\"")  // Escape quotes
+                                  .replace("\n", "\\n")   // Escape newlines
+                                  .replace("\r", "")      // Strip carriage returns
+                                  .replace("\t", "\\t");  // Escape TABS (The Bitcoin Fix!)
             
-           String rawResponse = aiClient.generateAnswer(prompt); 
+        //    String rawResponse = aiClient.generateAnswer(prompt); 
+        //     String cleanAnswer = parseAnswer(rawResponse);
+            String rawResponse = aiClient.generateAnswer(safePrompt); 
+            
+            // --- NEW DEBUGGING LINES ---
+            System.out.println("\n====== RAW API RESPONSE ======");
+            System.out.println(rawResponse);
+            System.out.println("==============================\n");
+            
             String cleanAnswer = parseAnswer(rawResponse);
+       //     System.out.println("AI: " + cleanAnswer);
             
             System.out.println("\nAI: " + cleanAnswer);
             
@@ -168,22 +193,28 @@ public class CLIApp {
             return new float[0];
         }
     }
-    private static String parseAnswer( String jsonResponse){
-        try{
-            String searchString = "\"text\": \"" ; 
-            int startIndex = jsonResponse.indexOf(searchString) ; 
-
-            if(startIndex == -1 ) return jsonResponse ; 
-
-            startIndex += searchString.length() ; 
-
-            int endIndex = jsonResponse.indexOf("\"}]," , startIndex) ; 
-            if(endIndex == -1 ) return jsonResponse ;
-
-            String answer = jsonResponse.substring(startIndex, endIndex) ; 
-           return answer.replace("\\n", "\n").replace("\\\"", "\"");
-        } catch( Exception e ){
-            return jsonResponse ; 
+  public static String parseAnswer(String jsonResponse) {
+        try {
+            String searchKey = "\"text\": \"";
+            int startIndex = jsonResponse.indexOf(searchKey);
+            
+            // If the API sent an error and "text" isn't there, print the raw error!
+            if (startIndex == -1) {
+                return "\n[API ERROR OR SAFETY BLOCK]\nRaw Response from Google:\n" + jsonResponse;
+            }
+            
+            startIndex += searchKey.length();
+            int endIndex = jsonResponse.indexOf("\"", startIndex);
+            
+            if (endIndex == -1) {
+                return "\n[JSON FORMAT ERROR]\nRaw Response:\n" + jsonResponse;
+            }
+            
+            String answer = jsonResponse.substring(startIndex, endIndex);
+            return answer.replace("\\n", "\n").replace("\\t", "\t").replace("\\\"", "\"");
+            
+        } catch (Exception e) {
+            return "CRITICAL PARSE ERROR: " + e.getMessage();
         }
     }
 }

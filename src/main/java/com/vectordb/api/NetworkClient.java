@@ -69,7 +69,14 @@ public class NetworkClient {
                                        .replace("\n", " ")
                                        .replace("\r", " ");
 
-            String jsonInputString = "{\"contents\": [{\"parts\": [{\"text\": \"" + cleanPrompt + "\"}]}]}";
+            // The Upgraded Payload:
+String jsonInputString = "{" +
+    "\"contents\": [{\"parts\": [{\"text\": \"" + cleanPrompt + "\"}]}]," +
+    "\"generationConfig\": {" +
+        "\"maxOutputTokens\": 1000," +
+        "\"temperature\": 0.3" + // 0.3 keeps the AI focused and factual
+    "}" +
+"}";
             
             try(OutputStream os = conn.getOutputStream()){
                 byte[] input = jsonInputString.getBytes("utf-8"); 
