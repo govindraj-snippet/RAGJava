@@ -66,20 +66,31 @@ public class CLIApp {
                 boolean success = false;
                 int waitTime = 2000; 
                 
-                while (!success) {
+               while (!success) {
                     try {
-                        // FIX: Get the String, then convert it to a float[]
                         String vectorString = aiClient.getEmbedding(chunk); 
                         float[] vector = parseVector(vectorString);
                         
                         if (vector != null && vector.length > 0) {
                             db.insert(new Document(chunk, vector));
                             success = true;
+                        } else {
+                            System.out.println("\nWarning: API returned an empty response. Skipping chunk.");
+                            break; 
                         }
                     } catch (Exception e) {
-                        System.out.println("\nAPI Rate Limit hit. Pausing for " + (waitTime/1000) + " seconds...");
+                      
+                        System.out.println("\nAPI Error: " + e.getMessage()); 
+                        System.out.println("Pausing for " + (waitTime/1000) + " seconds...");
+                        
                         Thread.sleep(waitTime);
                         waitTime *= 2; 
+                        
+                      
+                        if (waitTime > 120000) {
+                            System.out.println("\nGiving up on this chunk. Moving to the next one.");
+                            break;
+                        }
                     }
                 }
                 System.out.print("\rSaved chunk " + (i + 1) + " of " + chunks.size());
@@ -109,34 +120,70 @@ public class CLIApp {
                             "Context: " + bestMatch.getText() + " " +
                             "Question: " + question;
             
-            String answer = aiClient.generateAnswer(prompt); 
+           String rawResponse = aiClient.generateAnswer(prompt); 
+            String cleanAnswer = parseAnswer(rawResponse);
             
-            System.out.println("AI: " + answer);
+            System.out.println("\nAI: " + cleanAnswer);
             
         } catch (Exception e) {
             System.out.println("Error generating answer: " + e.getMessage());
         }
     }
 
-    // --- NEW HELPER METHOD ---
-    // Converts a JSON array string like "[0.1, 0.2, 0.3]" into a Java float[] array
-    private static float[] parseVector(String jsonArray) {
-        if (jsonArray == null || jsonArray.trim().isEmpty()) {
+  // --- UPDATED HELPER METHOD ---
+    private static float[] parseVector(String jsonResponse) {
+        if (jsonResponse == null || jsonResponse.trim().isEmpty()) {
             return new float[0];
         }
         
-        // Remove the [ and ] brackets from the string
-        String cleanString = jsonArray.replaceAll("\\[|\\]", "").trim();
-        
-        // Split the string by commas
-        String[] parts = cleanString.split(",");
-        float[] vector = new float[parts.length];
-        
-        // Convert each piece of text into a float number
-        for (int i = 0; i < parts.length; i++) {
-            vector[i] = Float.parseFloat(parts[i].trim());
+        try {
+            // 1. Find where the actual array of numbers starts and ends
+            int startIndex = jsonResponse.indexOf('[');
+            int endIndex = jsonResponse.lastIndexOf(']');
+            
+            if (startIndex == -1 || endIndex == -1) {
+                return new float[0]; // No array found
+            }
+            
+            // 2. Extract just the text inside the brackets
+            String arrayString = jsonResponse.substring(startIndex + 1, endIndex);
+            
+            // 3. Split the numbers by the comma
+            String[] parts = arrayString.split(",");
+            float[] vector = new float[parts.length];
+            
+            // 4. Convert each piece into a mathematical float
+            for (int i = 0; i < parts.length; i++) {
+                // Clean up any spaces or accidental quotes before parsing
+                String cleanNum = parts[i].replaceAll("[\"\\s\\n\\r]", "");
+                if (!cleanNum.isEmpty()) {
+                    vector[i] = Float.parseFloat(cleanNum);
+                }
+            }
+            
+            return vector;
+            
+        } catch (Exception e) {
+            System.out.println("Failed to parse vector math: " + e.getMessage());
+            return new float[0];
         }
-        
-        return vector;
+    }
+    private static String parseAnswer( String jsonResponse){
+        try{
+            String searchString = "\"text\": \"" ; 
+            int startIndex = jsonResponse.indexOf(searchString) ; 
+
+            if(startIndex == -1 ) return jsonResponse ; 
+
+            startIndex += searchString.length() ; 
+
+            int endIndex = jsonResponse.indexOf("\"}]," , startIndex) ; 
+            if(endIndex == -1 ) return jsonResponse ;
+
+            String answer = jsonResponse.substring(startIndex, endIndex) ; 
+           return answer.replace("\\n", "\n").replace("\\\"", "\"");
+        } catch( Exception e ){
+            return jsonResponse ; 
+        }
     }
 }
