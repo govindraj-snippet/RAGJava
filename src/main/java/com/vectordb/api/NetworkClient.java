@@ -15,7 +15,7 @@ public class NetworkClient {
 
     
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent";
-    private static final String API_KEY = "AIzaSyCOQMoMGhbIZAs1sFT93Uktewrm0A-b19k"; 
+    private static final String API_KEY = "YOUR_API_KEY"; 
 
     public String getEmbedding(String text){
 
