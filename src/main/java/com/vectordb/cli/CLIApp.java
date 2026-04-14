@@ -140,11 +140,7 @@ public class CLIApp {
         //     String cleanAnswer = parseAnswer(rawResponse);
             String rawResponse = aiClient.generateAnswer(safePrompt); 
             
-            // --- NEW DEBUGGING LINES ---
-            System.out.println("\n====== RAW API RESPONSE ======");
-            System.out.println(rawResponse);
-            System.out.println("==============================\n");
-            
+
             String cleanAnswer = parseAnswer(rawResponse);
        //     System.out.println("AI: " + cleanAnswer);
             
@@ -157,7 +153,10 @@ public class CLIApp {
 
   // --- UPDATED HELPER METHOD ---
     private static float[] parseVector(String jsonResponse) {
-        if (jsonResponse == null || jsonResponse.trim().isEmpty()) {
+        if (jsonResponse == null || jsonResponse.trim().isEmpty() || jsonResponse.startsWith("Error")) {
+            if (jsonResponse != null && jsonResponse.startsWith("Error")) {
+                System.out.println("API Error Response: " + jsonResponse.split("\n")[0]);
+            }
             return new float[0];
         }
         

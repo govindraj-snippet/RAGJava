@@ -1,2 +1,12 @@
-E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\Main.java
-E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\NetworkClient.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\api\NetworkClient.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\cli\CLIApp.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\cli\Main.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\database\VectorDatabase.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\database\VectorMath.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\models\Document.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\parsers\DocumentParser.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\parsers\ParserFactory.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\parsers\PdfParser.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\parsers\TextChunker.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\parsers\TextParser.java
+E:\GOPROGRAM\java projects\RAGJava\src\main\java\com\vectordb\parsers\WordParser.java

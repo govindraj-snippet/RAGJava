@@ -15,7 +15,13 @@ public class NetworkClient {
 
     
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent";
-    private static final String API_KEY = "YOUR_API_KEY"; 
+    private static final String API_KEY; 
+
+    static {
+        // Load the API_KEY from the src/.env file
+        io.github.cdimascio.dotenv.Dotenv dotenv = io.github.cdimascio.dotenv.Dotenv.configure().directory("src").load();
+        API_KEY = dotenv.get("API_KEY");
+    }
 
     public String getEmbedding(String text){
 
