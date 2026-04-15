@@ -1,0 +1,12 @@
+com\vectordb\cli\Main.class
+com\vectordb\parsers\TextParser.class
+com\vectordb\api\NetworkClient.class
+com\vectordb\cli\CLIApp.class
+com\vectordb\database\VectorMath.class
+com\vectordb\database\VectorDatabase.class
+com\vectordb\models\Document.class
+com\vectordb\parsers\ParserFactory.class
+com\vectordb\parsers\PdfParser.class
+com\vectordb\parsers\TextChunker.class
+com\vectordb\parsers\DocumentParser.class
+com\vectordb\parsers\WordParser.class

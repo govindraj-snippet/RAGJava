@@ -19,7 +19,7 @@ public class NetworkClient {
 
     static {
         // Load the API_KEY from the src/.env file
-        io.github.cdimascio.dotenv.Dotenv dotenv = io.github.cdimascio.dotenv.Dotenv.configure().directory("src").load();
+        io.github.cdimascio.dotenv.Dotenv dotenv = io.github.cdimascio.dotenv.Dotenv.configure().directory("src").ignoreIfMissing().load();
         API_KEY = dotenv.get("API_KEY");
     }
 
